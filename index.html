@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Life OS — AI Life Operating System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --bg: #f9fafb;
+            --text: #111827;
+            --muted: #6b7280;
+            --card: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(180deg, #eef2ff, #f9fafb);
+            color: var(--text);
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 80px 24px;
+        }
+
+        /* ---------- HERO ---------- */
+
+        .hero {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 60px;
+            align-items: center;
+            margin-bottom: 120px;
+        }
+
+        .hero h1 {
+            font-size: 3.2rem;
+            line-height: 1.15;
+            margin-bottom: 20px;
+        }
+
+        .hero p {
+            font-size: 1.15rem;
+            color: var(--muted);
+            margin-bottom: 32px;
+            max-width: 520px;
+        }
+
+        .cta {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 14px 22px;
+            font-size: 1rem;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid #d1d5db;
+            padding: 14px 22px;
+            font-size: 1rem;
+            border-radius: 10px;
+            color: var(--text);
+        }
+
+        /* ---------- HERO CARD ---------- */
+
+        .preview {
+            background: var(--card);
+            border-radius: 18px;
+            padding: 28px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.08);
+        }
+
+        .preview h3 {
+            margin: 0 0 16px;
+            font-size: 1.1rem;
+        }
+
+        .preview-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 0.95rem;
+        }
+
+        .badge {
+            background: #eef2ff;
+            color: var(--primary-dark);
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 0.75rem;
+        }
+
+        /* ---------- FEATURES ---------- */
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 32px;
+            margin-bottom: 120px;
+        }
+
+        .feature {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 28px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
+        }
+
+        .feature h4 {
+            margin-bottom: 12px;
+            font-size: 1.1rem;
+        }
+
+        .feature p {
+            color: var(--muted);
+            font-size: 0.95rem;
+        }
+
+        /* ---------- SIGNUP ---------- */
+
+        .signup {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 24px;
+            padding: 64px 32px;
+            color: white;
+            text-align: center;
+        }
+
+        .signup h2 {
+            font-size: 2.2rem;
+            margin-bottom: 12px;
+        }
+
+        .signup p {
+            opacity: 0.9;
+            margin-bottom: 32px;
+        }
+
+        form {
+            max-width: 420px;
+            margin: 0 auto;
+            display: grid;
+            gap: 12px;
+        }
+
+        input {
+            padding: 14px;
+            border-radius: 10px;
+            border: none;
+            font-size: 1rem;
+        }
+
+        .signup button {
+            background: white;
+            color: var(--primary-dark);
+            border: none;
+            padding: 14px;
+            font-size: 1rem;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        footer {
+            margin-top: 80px;
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--muted);
+        }
+
+        /* ---------- RESPONSIVE ---------- */
+
+        @media (max-width: 900px) {
+            .hero {
+                grid-template-columns: 1fr;
+            }
+
+            .features {
+                grid-template-columns: 1fr;
+            }
+
+            .hero h1 {
+                font-size: 2.4rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+
+        <!-- HERO -->
+        <section class="hero">
+            <div>
+                <h1>Life OS.<br>An AI Operating System for Your Life.</h1>
+                <p>
+                    Life OS plans your day intelligently and reflects on it at night —
+                    so your time, energy, and effort actually compound into growth.
+                </p>
+                <div class="cta">
+                    <button class="btn-primary">Get Early Access</button>
+                    <button class="btn-secondary">See How It Works</button>
+                </div>
+            </div>
+
+            <div class="preview">
+                <h3>Today’s Plan</h3>
+                <div class="preview-item">
+                    <span>Deep Work Session</span>
+                    <span class="badge">High Focus</span>
+                </div>
+                <div class="preview-item">
+                    <span>Admin Tasks</span>
+                    <span class="badge">Low Energy</span>
+                </div>
+                <div class="preview-item">
+                    <span>Workout</span>
+                    <span class="badge">Health</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- FEATURES -->
+        <section class="features">
+            <div class="feature">
+                <h4>🧠 AI Planning</h4>
+                <p>
+                    Dump your goals and tasks. Life OS automatically schedules them
+                    based on energy, priority, and deadlines.
+                </p>
+            </div>
+
+            <div class="feature">
+                <h4>📊 Daily Reflection</h4>
+                <p>
+                    Every night, Life OS summarizes your day and highlights what truly
+                    moved your life forward.
+                </p>
+            </div>
+
+            <div class="feature">
+                <h4>🎮 Game-like Growth</h4>
+                <p>
+                    Track life score, XP, streaks, and achievements — turning consistency
+                    into visible progress.
+                </p>
+            </div>
+        </section>
+
+        <!-- SIGNUP -->
+        <section class="signup">
+            <h2>Join the Life OS Beta</h2>
+            <p>
+                We’re inviting early users to help shape the future of AI-powered life planning.
+            </p>
+
+            <form>
+                <input type="text" placeholder="Your name" required />
+                <input type="email" placeholder="Your email" required />
+                <button type="submit">Request Access</button>
+            </form>
+        </section>
+
+        <footer>
+            © 2026 Life OS · Early prototype · Built for learning & experimentation
+        </footer>
+
+    </div>
+</body>
+
+</html>
