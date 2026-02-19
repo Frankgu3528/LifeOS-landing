@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FindMyAdvisor - Unified Input UI</title>
+    <style>
+        /* ================= Design System ================= */
+        :root {
+            --cmu-red: #C41230;
+            --bg-color: #F8FAFC;
+            --surface: #FFFFFF;
+            --text-main: #0F172A;
+            --text-muted: #64748B;
+            --border: #E2E8F0;
+            --success: #10B981;
+            --accent-blue: #3B82F6;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .stage {
+            display: none;
+            width: 100vw;
+            height: 100vh;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .stage.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        /* ================= STAGE 1: STRUCTURED INPUT ================= */
+        #input-stage {
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-color);
+        }
+
+        .hero-text {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.04em;
+        }
+
+        .hero-text span {
+            color: var(--cmu-red);
+        }
+
+        .sub-text {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .input-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2.5rem 3rem;
+            width: 750px;
+            box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
+        }
+
+        .form-row {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+        }
+
+        .form-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: white;
+            color: var(--text-main);
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+            appearance: none;
+        }
+
+        select.form-control {
+            cursor: pointer;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px;
+            padding-right: 40px;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        /* 👑 统一的混合输入框 (Hybrid Input Box) */
+        .hybrid-input-container {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: white;
+            padding: 12px 14px;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            cursor: text;
+        }
+
+        /* 当内部的 textarea 聚焦时，高亮整个外部容器 */
+        .hybrid-input-container:has(textarea:focus) {
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .hybrid-tags-area {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 8px;
+        }
+
+        .input-tag {
+            background: #F1F5F9;
+            color: #334155;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            user-select: none;
+        }
+
+        .input-tag span {
+            cursor: pointer;
+            color: #94A3B8;
+        }
+
+        .input-tag span:hover {
+            color: #EF4444;
+        }
+
+        .hybrid-input-container textarea {
+            width: 100%;
+            border: none;
+            outline: none;
+            resize: vertical;
+            min-height: 80px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: var(--text-main);
+            background: transparent;
+            font-family: inherit;
+        }
+
+        .hybrid-input-container textarea::placeholder {
+            color: #94A3B8;
+        }
+
+        .upload-zone {
+            border: 2px dashed #CBD5E1;
+            background: #F8FAFC;
+            border-radius: 12px;
+            padding: 1.5rem;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .upload-zone:hover {
+            border-color: var(--accent-blue);
+            background: #EFF6FF;
+        }
+
+        .file-list {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-main);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+
+        .file-icon {
+            color: var(--success);
+        }
+
+        .btn-primary {
+            background-color: var(--cmu-red);
+            color: white;
+            border: none;
+            padding: 1.2rem;
+            border-radius: 8px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+            margin-top: 1rem;
+            box-shadow: 0 4px 12px rgba(196, 18, 48, 0.2);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            background-color: #A30F28;
+            box-shadow: 0 6px 16px rgba(196, 18, 48, 0.3);
+        }
+
+        /* ================= STAGE 2: OUTPUT ================= */
+        #output-stage {
+            display: grid;
+            grid-template-columns: 38% 62%;
+            height: 100vh;
+            background: var(--bg-color);
+        }
+
+        .left-panel {
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            padding: 2.5rem;
+            box-shadow: 4px 0 24px rgba(0, 0, 0, 0.02);
+            z-index: 10;
+        }
+
+        .process-header {
+            margin-bottom: 2rem;
+        }
+
+        .process-header h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .spinner-ring {
+            width: 18px;
+            height: 18px;
+            border: 3px solid #E2E8F0;
+            border-top-color: var(--accent-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .timeline {
+            flex: 1;
+            overflow-y: auto;
+            position: relative;
+            padding-left: 10px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            bottom: 0;
+            left: 24px;
+            width: 2px;
+            background: #F1F5F9;
+            z-index: 1;
+        }
+
+        .step-item {
+            position: relative;
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.8rem;
+            opacity: 0;
+            transform: translateY(15px);
+            animation: slideUpFade 0.5s forwards;
+            z-index: 2;
+        }
+
+        @keyframes slideUpFade {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .step-icon {
+            width: 30px;
+            height: 30px;
+            background: white;
+            border: 2px solid #E2E8F0;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .step-item.completed .step-icon {
+            background: var(--success);
+            border-color: var(--success);
+            color: white;
+        }
+
+        .step-item.active .step-icon {
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        }
+
+        .step-content {
+            flex: 1;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+        }
+
+        .step-title {
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-bottom: 0.3rem;
+            color: var(--text-main);
+        }
+
+        .step-desc {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .right-panel {
+            padding: 3rem 4rem;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .skeleton-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            transition: opacity 0.5s ease;
+        }
+
+        .skeleton-header {
+            width: 250px;
+            height: 30px;
+            background: #E2E8F0;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            animation: pulse 1.5s infinite;
+        }
+
+        .skeleton-card {
+            height: 120px;
+            background: white;
+            border: 1px solid #E2E8F0;
+            border-radius: 12px;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        #actual-results {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.6s ease;
+        }
+
+        #actual-results.visible {
+            display: block;
+            opacity: 1;
+        }
+
+        .results-header h2 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .results-header p {
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+        }
+
+        .advisor-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .advisor-card:hover {
+            border-color: var(--cmu-red);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+            transform: translateY(-2px);
+        }
+
+        .advisor-info h4 {
+            font-size: 1.15rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .advisor-info p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            background: #F1F5F9;
+            color: #475569;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .tag.success {
+            background: #ECFDF5;
+            color: #047857;
+        }
+
+        .score-box {
+            text-align: right;
+        }
+
+        .score-number {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--success);
+            line-height: 1;
+        }
+
+        .score-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 4px;
+        }
+
+        .drawer {
+            position: fixed;
+            top: 0;
+            right: -600px;
+            width: 500px;
+            height: 100vh;
+            background: var(--surface);
+            box-shadow: -10px 0 30px rgba(0, 0, 0, 0.05);
+            transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            padding: 2.5rem;
+            z-index: 100;
+            border-left: 1px solid var(--border);
+        }
+
+        .drawer.open {
+            right: 0;
+        }
+
+        .sop-diff {
+            background: #F8FAFC;
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+            margin-top: 1.5rem;
+        }
+
+        .diff-old {
+            text-decoration: line-through;
+            color: #EF4444;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            opacity: 0.6;
+        }
+
+        .diff-new {
+            color: #059669;
+            font-weight: 500;
+            background: #D1FAE5;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            border-left: 4px solid #059669;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="input-stage" class="stage active">
+        <h1 class="hero-text">FindMy<span>Advisor</span>.</h1>
+        <p class="sub-text">Define your academic targets. We handle the deep web research.</p>
+
+        <div class="input-card">
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Target Institution</label>
+                    <select class="form-control">
+                        <option value="cmu" selected>Carnegie Mellon University</option>
+                        <option value="mit">Massachusetts Institute of Technology</option>
+                        <option value="stanford">Stanford University</option>
+                        <option value="yale">Yale University</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Target Department / Lab</label>
+                    <select class="form-control">
+                        <option value="lti" selected>Language Technologies Institute (LTI)</option>
+                        <option value="mld">Machine Learning Department (MLD)</option>
+                        <option value="ri">Robotics Institute (RI)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group" style="width: 100%;">
+                    <label class="form-label">Research Statement & Keywords (Optional)</label>
+
+                    <div class="hybrid-input-container" onclick="document.getElementById('research-textarea').focus();">
+                        <div class="hybrid-tags-area">
+                            <div class="input-tag">Large Language Models <span>×</span></div>
+                            <div class="input-tag">Efficient Reasoning <span>×</span></div>
+                            <div class="input-tag">NLP <span>×</span></div>
+                        </div>
+
+                        <textarea id="research-textarea"
+                            placeholder="Briefly describe your research interests and goals..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Application Materials</label>
+                    <div class="upload-zone">
+                        <div class="file-list">
+                            <div class="file-item">
+                                <span class="file-icon">✓</span> Gefei_CV_2025.pdf
+                            </div>
+                            <div class="file-item">
+                                <span class="file-icon">✓</span> SOP_Draft_MIIS.docx
+                            </div>
+                        </div>
+                        <span style="color: var(--accent-blue); font-weight: 500;">+ Browse or Drop</span>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn-primary" onclick="startDeepResearch()">Initialize Deep Research Pipeline ✧</button>
+        </div>
+    </div>
+
+    <div id="output-stage" class="stage">
+
+        <section class="left-panel">
+            <div class="process-header">
+                <h3 id="process-title">
+                    <div class="spinner-ring" id="main-spinner"></div> Researching...
+                </h3>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 6px;">Synthesizing 40+ dynamic
+                    sources</p>
+            </div>
+            <div class="timeline" id="timeline-container">
+            </div>
+        </section>
+
+        <section class="right-panel">
+            <div id="loading-skeletons" class="skeleton-wrapper">
+                <div class="skeleton-header"></div>
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+            </div>
+
+            <div id="actual-results">
+                <div class="results-header">
+                    <h2>Top Recommended Advisors</h2>
+                    <p>Ranked by semantic alignment, verified funding, and recent activity.</p>
+                </div>
+
+                <div class="advisor-card" onclick="openDrawer()">
+                    <div class="advisor-info">
+                        <h4>Prof. Graham Neubig</h4>
+                        <p>Language Technologies Institute, CMU</p>
+                        <div class="tags">
+                            <span class="tag success">✓ Active NSF Funding</span>
+                            <span class="tag">Agentic Reasoning</span>
+                            <span class="tag">LLM Evaluation</span>
+                        </div>
+                    </div>
+                    <div class="score-box">
+                        <div class="score-number">95%</div>
+                        <div class="score-label">Match Score</div>
+                    </div>
+                </div>
+
+                <div class="advisor-card">
+                    <div class="advisor-info">
+                        <h4>Prof. Yonatan Bisk</h4>
+                        <p>Language Technologies Institute, CMU</p>
+                        <div class="tags">
+                            <span class="tag success">✓ Taking Students</span>
+                            <span class="tag">Embodied AI</span>
+                            <span class="tag">Grounding</span>
+                        </div>
+                    </div>
+                    <div class="score-box">
+                        <div class="score-number" style="color:#F59E0B">88%</div>
+                        <div class="score-label">Match Score</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="sop-drawer" class="drawer">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                    <h3 style="font-size: 1.25rem;">Tailor for Prof. Neubig</h3>
+                    <button onclick="closeDrawer()"
+                        style="border:none; background:none; font-size:1.8rem; cursor:pointer; color: var(--text-muted);">&times;</button>
+                </div>
+
+                <p style="color:var(--text-muted); font-size: 0.95rem; line-height: 1.6;">
+                    <strong>Alignment Rationale:</strong> The agent detected that Prof. Neubig's lab recently published
+                    a preprint on "Verifying Agentic Reasoning Steps". Your background in ReAct workflows is a strong
+                    fit if phrased correctly.
+                </p>
+
+                <div class="sop-diff">
+                    <p
+                        style="font-weight: 600; font-size: 0.85rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 12px; letter-spacing: 0.5px;">
+                        Suggested SOP Revision</p>
+                    <div class="diff-old">
+                        "I implemented various LLM APIs to create a workflow system that could handle multi-step tasks
+                        efficiently."
+                    </div>
+                    <div class="diff-new">
+                        "Leveraging the ReAct paradigm, I engineered an autonomous pipeline specifically designed to
+                        address intermediate reasoning verification—a challenge central to robust agentic systems."
+                    </div>
+                    <button class="btn-primary" style="margin-top: 1rem; padding: 0.8rem; font-size: 0.9rem;">Accept &
+                        Update SOP</button>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        const researchSteps = [
+            { icon: "📄", title: "Parsing Academic Profile", desc: "Extracting entities: NLP, ReAct, Machine Learning from CV and SOP." },
+            { icon: "🔍", title: "Semantic Retrieval", desc: "Querying SPECTER vector DB against CMU LTI faculty abstracts." },
+            { icon: "🌐", title: "Deep Web Verification", desc: "Cross-referencing NSF/NIH award APIs and lab websites for funding status." },
+            { icon: "🧠", title: "Synthesizing Recent Work", desc: "Analyzing 2024-2025 preprints to assess current research trajectory." },
+            { icon: "✨", title: "Generating Suggestions", desc: "Formulating targeted SOP revisions based on alignment analysis." }
+        ];
+
+        function startDeepResearch() {
+            document.getElementById('input-stage').classList.remove('active');
+            setTimeout(() => {
+                document.getElementById('output-stage').classList.add('active');
+                runResearchSequence();
+            }, 500);
+        }
+
+        function runResearchSequence() {
+            const container = document.getElementById('timeline-container');
+            let delayTime = 500;
+            let currentActiveElement = null;
+
+            researchSteps.forEach((step, index) => {
+                setTimeout(() => {
+                    if (currentActiveElement) {
+                        currentActiveElement.classList.remove('active');
+                        currentActiveElement.classList.add('completed');
+                        currentActiveElement.querySelector('.step-icon').innerHTML = "✓";
+                    }
+
+                    const stepEl = document.createElement('div');
+                    stepEl.className = 'step-item active';
+                    stepEl.innerHTML = `
+                        <div class="step-icon">${step.icon}</div>
+                        <div class="step-content">
+                            <div class="step-title">${step.title}</div>
+                            <div class="step-desc">${step.desc}</div>
+                        </div>
+                    `;
+                    container.appendChild(stepEl);
+                    currentActiveElement = stepEl;
+                    container.scrollTop = container.scrollHeight;
+
+                    if (index === researchSteps.length - 1) {
+                        setTimeout(() => {
+                            stepEl.classList.remove('active');
+                            stepEl.classList.add('completed');
+                            stepEl.querySelector('.step-icon').innerHTML = "✓";
+
+                            document.getElementById('main-spinner').style.display = 'none';
+                            document.getElementById('process-title').innerHTML = "✓ Research Complete";
+                            document.getElementById('process-title').style.color = "var(--success)";
+
+                            revealResults();
+                        }, 1500);
+                    }
+                }, delayTime);
+                delayTime += 1500 + Math.random() * 1000;
+            });
+        }
+
+        function revealResults() {
+            const skeleton = document.getElementById('loading-skeletons');
+            skeleton.style.opacity = '0';
+            setTimeout(() => {
+                skeleton.style.display = 'none';
+                const results = document.getElementById('actual-results');
+                results.classList.add('visible');
+            }, 500);
+        }
+
+        function openDrawer() { document.getElementById('sop-drawer').classList.add('open'); }
+        function closeDrawer() { document.getElementById('sop-drawer').classList.remove('open'); }
+    </script>
+</body>
+
+</html>
