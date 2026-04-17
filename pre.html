@@ -1,0 +1,2163 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kairos · Decision Path Simulation & Risk Quantification Platform</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --cream: #f5f0e8;
+            --ink: #1a1612;
+            --ink2: #3d3830;
+            --muted: #8a8070;
+            --rule: #d5cfc4;
+            --accent: #c0392b;
+            --accent2: #2c6e49;
+            --accent3: #1a5276;
+            --gold: #b7860b;
+            --serif: 'DM Serif Display', Georgia, serif;
+            --sans: 'DM Sans', sans-serif;
+            --mono: 'DM Mono', monospace;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background: var(--cream);
+            color: var(--ink);
+            font-family: var(--sans);
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        .progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--rule);
+            z-index: 100;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--accent);
+            transition: width .3s ease;
+        }
+
+        .nav {
+            position: fixed;
+            bottom: 28px;
+            right: 28px;
+            display: flex;
+            gap: 8px;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            width: 36px;
+            height: 36px;
+            border: 1px solid var(--rule);
+            background: var(--cream);
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 14px;
+            color: var(--ink2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all .15s;
+            font-family: var(--sans);
+        }
+
+        .nav-btn:hover {
+            background: var(--ink);
+            color: var(--cream);
+            border-color: var(--ink);
+        }
+
+        .slide {
+            width: 100%;
+            min-height: 100vh;
+            padding: 72px 10% 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            border-bottom: 1px solid var(--rule);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .slide-num {
+            position: absolute;
+            top: 28px;
+            right: 36px;
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--muted);
+            letter-spacing: .1em;
+        }
+
+        .slide-label {
+            font-family: var(--mono);
+            font-size: 10px;
+            letter-spacing: .25em;
+            color: var(--muted);
+            text-transform: uppercase;
+            margin-bottom: 40px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .slide-label::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--rule);
+        }
+
+        h2 {
+            font-family: var(--serif);
+            font-size: clamp(26px, 3.2vw, 46px);
+            line-height: 1.12;
+            margin-bottom: 40px;
+            max-width: 700px;
+        }
+
+        .pull-quote {
+            border-left: 3px solid var(--accent);
+            padding: 14px 22px;
+            font-family: var(--serif);
+            font-size: 17px;
+            font-style: italic;
+            color: var(--ink2);
+            max-width: 580px;
+        }
+
+        /* Animations */
+        .slide>* {
+            opacity: 0;
+            transform: translateY(14px);
+            transition: opacity .5s ease, transform .5s ease;
+        }
+
+        .slide.visible>* {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .slide.visible>*:nth-child(2) {
+            transition-delay: .08s
+        }
+
+        .slide.visible>*:nth-child(3) {
+            transition-delay: .16s
+        }
+
+        .slide.visible>*:nth-child(4) {
+            transition-delay: .24s
+        }
+
+        .slide.visible>*:nth-child(5) {
+            transition-delay: .32s
+        }
+
+        .slide.visible>*:nth-child(6) {
+            transition-delay: .40s
+        }
+
+        .slide.visible>*:nth-child(7) {
+            transition-delay: .48s
+        }
+
+        /* ── S1 TITLE ── */
+        #s1 {
+            background: var(--ink);
+            color: var(--cream);
+        }
+
+        #s1 .bg-grid {
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            width: 44%;
+            background-image: linear-gradient(rgba(255, 255, 255, .03) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, .03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+        }
+
+        #s1 .eyebrow {
+            font-family: var(--mono);
+            font-size: 11px;
+            letter-spacing: .22em;
+            color: var(--muted);
+            margin-bottom: 28px;
+            text-transform: uppercase;
+        }
+
+        #s1 h1 {
+            font-family: var(--serif);
+            font-size: clamp(34px, 5vw, 66px);
+            line-height: 1.08;
+            color: var(--cream);
+            margin-bottom: 22px;
+            max-width: 820px;
+        }
+
+        #s1 h1 em {
+            font-style: italic;
+            color: #e8c87a;
+        }
+
+        #s1 .subtitle {
+            font-size: 15px;
+            font-weight: 300;
+            color: rgba(245, 240, 232, .5);
+            max-width: 500px;
+            line-height: 1.7;
+            margin-bottom: 52px;
+        }
+
+        .author-line {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            border-top: 1px solid rgba(255, 255, 255, .1);
+            padding-top: 24px;
+        }
+
+        .author-line .name {
+            font-size: 13px;
+            color: rgba(245, 240, 232, .65);
+        }
+
+        .author-line .divider {
+            width: 1px;
+            height: 14px;
+            background: rgba(255, 255, 255, .15);
+        }
+
+        .author-line .course {
+            font-size: 12px;
+            color: rgba(245, 240, 232, .35);
+            font-family: var(--mono);
+        }
+
+        /* ── S2 PROBLEM ── */
+        #s2 {}
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1px;
+            background: var(--rule);
+            border: 1px solid var(--rule);
+            margin-bottom: 36px;
+        }
+
+        .comp-cell {
+            background: var(--cream);
+            padding: 22px 20px;
+        }
+
+        .comp-cell.highlight {
+            background: #f0ece3;
+        }
+
+        .comp-cell .method {
+            font-family: var(--mono);
+            font-size: 10px;
+            letter-spacing: .15em;
+            color: var(--muted);
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .comp-cell .answer {
+            font-family: var(--serif);
+            font-size: 26px;
+            margin-bottom: 7px;
+        }
+
+        .comp-cell .caveat {
+            font-size: 12px;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        /* ── S3 CHESS ANALOGY ── */
+        #s3 {
+            background: #f0ece3;
+        }
+
+        .analogy-split {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 28px;
+            margin-bottom: 36px;
+        }
+
+        .analogy-card {
+            border: 1px solid var(--rule);
+            border-radius: 4px;
+            overflow: hidden;
+            background: var(--cream);
+        }
+
+        .analogy-card-head {
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--rule);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .analogy-card-head .icon {
+            font-size: 18px;
+        }
+
+        .analogy-card-head .title {
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .analogy-card-head .badge {
+            margin-left: auto;
+            font-family: var(--mono);
+            font-size: 9px;
+            padding: 2px 7px;
+            border-radius: 2px;
+        }
+
+        .badge-old {
+            background: rgba(138, 128, 112, .12);
+            color: var(--muted);
+        }
+
+        .badge-new {
+            background: rgba(192, 57, 43, .1);
+            color: var(--accent);
+        }
+
+        .analogy-card-body {
+            padding: 18px;
+        }
+
+        .analogy-row {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            margin-bottom: 10px;
+            font-size: 13px;
+            color: var(--ink2);
+            line-height: 1.5;
+        }
+
+        .analogy-row .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--rule);
+            flex-shrink: 0;
+            margin-top: 6px;
+        }
+
+        .analogy-row .dot.red {
+            background: var(--accent);
+        }
+
+        .analogy-row .dot.green {
+            background: var(--accent2);
+        }
+
+        /* Key insight strip */
+        .insight-strip {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1px;
+            background: var(--rule);
+            border: 1px solid var(--rule);
+        }
+
+        .insight-cell {
+            background: var(--cream);
+            padding: 18px 16px;
+        }
+
+        .insight-cell .n {
+            font-family: var(--serif);
+            font-size: 28px;
+            margin-bottom: 4px;
+        }
+
+        .insight-cell .t {
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .insight-cell .d {
+            font-size: 12px;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        /* ── S4 DEPTH ── */
+        #s4 {}
+
+        .depth-intro {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 28px;
+            margin-bottom: 32px;
+            align-items: start;
+        }
+
+        .depth-text {}
+
+        .depth-text p {
+            font-size: 14px;
+            color: var(--ink2);
+            line-height: 1.7;
+            margin-bottom: 14px;
+        }
+
+        .depth-text strong {
+            color: var(--ink);
+            font-weight: 500;
+        }
+
+        .round-timeline {
+            border: 1px solid var(--rule);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .round-header {
+            background: var(--ink);
+            color: var(--cream);
+            padding: 10px 16px;
+            font-family: var(--mono);
+            font-size: 10px;
+            letter-spacing: .15em;
+        }
+
+        .round-item {
+            display: grid;
+            grid-template-columns: 56px 1fr 1fr;
+            border-bottom: 1px solid var(--rule);
+        }
+
+        .round-item:last-child {
+            border-bottom: none;
+        }
+
+        .round-num {
+            background: #f0ece3;
+            padding: 12px 14px;
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--muted);
+            border-right: 1px solid var(--rule);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .round-us {
+            padding: 10px 12px;
+            border-right: 1px solid var(--rule);
+        }
+
+        .round-ir {
+            padding: 10px 12px;
+        }
+
+        .round-agent {
+            font-family: var(--mono);
+            font-size: 9px;
+            letter-spacing: .1em;
+            color: var(--muted);
+            margin-bottom: 3px;
+        }
+
+        .round-action {
+            font-size: 12px;
+            color: var(--ink2);
+            line-height: 1.4;
+        }
+
+        .round-escalate {
+            background: rgba(192, 57, 43, .04);
+        }
+
+        .chain-effect {
+            background: var(--ink);
+            color: var(--cream);
+            border-radius: 4px;
+            padding: 18px 20px;
+        }
+
+        .chain-label {
+            font-family: var(--mono);
+            font-size: 9px;
+            letter-spacing: .2em;
+            color: var(--muted);
+            margin-bottom: 12px;
+        }
+
+        .chain-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .chain-step {
+            font-size: 12px;
+            padding: 5px 10px;
+            border: 1px solid rgba(255, 255, 255, .1);
+            border-radius: 2px;
+            white-space: nowrap;
+        }
+
+        .chain-arrow {
+            color: rgba(255, 255, 255, .2);
+            font-size: 10px;
+            flex-shrink: 0;
+        }
+
+        .chain-row.hot .chain-step {
+            border-color: rgba(192, 57, 43, .4);
+            color: rgba(232, 200, 122, .9);
+        }
+
+        /* ── S5 ARCHITECTURE ── */
+        #s5 {
+            background: #f0ece3;
+        }
+
+        .arch-flow {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1px;
+            background: var(--rule);
+            border: 1px solid var(--rule);
+            margin-bottom: 28px;
+        }
+
+        .arch-step {
+            background: var(--cream);
+            padding: 20px 16px;
+            position: relative;
+        }
+
+        .arch-step::after {
+            content: '→';
+            position: absolute;
+            right: -9px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--muted);
+            font-size: 12px;
+            z-index: 1;
+            background: var(--cream);
+            padding: 2px 0;
+        }
+
+        .arch-step:last-child::after {
+            display: none;
+        }
+
+        .step-n {
+            font-family: var(--mono);
+            font-size: 10px;
+            color: var(--muted);
+            margin-bottom: 8px;
+        }
+
+        .step-title {
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+
+        .step-desc {
+            font-size: 11px;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        .step-tag {
+            display: inline-block;
+            margin-top: 8px;
+            font-family: var(--mono);
+            font-size: 9px;
+            padding: 2px 6px;
+            border-radius: 2px;
+            letter-spacing: .06em;
+        }
+
+        .tag-llm {
+            background: rgba(192, 57, 43, .1);
+            color: var(--accent);
+        }
+
+        .tag-sys {
+            background: rgba(44, 110, 73, .1);
+            color: var(--accent2);
+        }
+
+        .tag-data {
+            background: rgba(26, 82, 118, .1);
+            color: var(--accent3);
+        }
+
+        .prompt-example {
+            border: 1px solid var(--rule);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .prompt-header {
+            background: var(--ink);
+            color: var(--cream);
+            padding: 10px 16px;
+            font-family: var(--mono);
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .prompt-header .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #e8c87a;
+        }
+
+        .prompt-body {
+            padding: 14px 16px;
+            font-family: var(--mono);
+            font-size: 11px;
+            line-height: 1.8;
+            color: var(--ink2);
+            background: white;
+        }
+
+        .prompt-body .kw {
+            color: var(--accent);
+            font-weight: 500;
+        }
+
+        .prompt-body .str {
+            color: var(--accent2);
+        }
+
+        .prompt-body .cmt {
+            color: var(--muted);
+        }
+
+        /* ── S6 OUTPUT ── */
+        #s6 {}
+
+        .output-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 22px;
+            margin-bottom: 28px;
+        }
+
+        .output-card {
+            border: 1px solid var(--rule);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .output-card-header {
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--rule);
+            font-family: var(--mono);
+            font-size: 10px;
+            letter-spacing: .12em;
+            color: var(--muted);
+            text-transform: uppercase;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .output-card-body {
+            padding: 18px 14px;
+        }
+
+        .dist-bar-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 9px;
+        }
+
+        .dist-bar-label {
+            font-size: 11px;
+            color: var(--ink2);
+            width: 110px;
+            flex-shrink: 0;
+        }
+
+        .dist-bar-track {
+            flex: 1;
+            height: 18px;
+            background: #f0ece3;
+            border-radius: 2px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dist-bar-fill {
+            height: 100%;
+            border-radius: 2px;
+            display: flex;
+            align-items: center;
+            padding-left: 8px;
+        }
+
+        .dist-bar-pct {
+            font-family: var(--mono);
+            font-size: 10px;
+            font-weight: 500;
+        }
+
+        .bar-a {
+            background: rgba(44, 110, 73, .2);
+        }
+
+        .bar-a .dist-bar-pct {
+            color: var(--accent2);
+        }
+
+        .bar-b {
+            background: rgba(183, 134, 11, .15);
+        }
+
+        .bar-b .dist-bar-pct {
+            color: var(--gold);
+        }
+
+        .bar-c {
+            background: rgba(192, 57, 43, .15);
+        }
+
+        .bar-c .dist-bar-pct {
+            color: var(--accent);
+        }
+
+        .dist-n {
+            font-family: var(--mono);
+            font-size: 9px;
+            color: var(--muted);
+            margin-top: 6px;
+        }
+
+        .vol-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 9px;
+        }
+
+        .vol-asset {
+            font-size: 11px;
+            font-weight: 500;
+            width: 72px;
+        }
+
+        .vol-minl,
+        .vol-maxl {
+            font-family: var(--mono);
+            font-size: 10px;
+        }
+
+        .vol-minl {
+            color: var(--accent2);
+        }
+
+        .vol-maxl {
+            color: var(--accent);
+        }
+
+        .vol-range {
+            flex: 1;
+            height: 8px;
+            background: #f0ece3;
+            border-radius: 4px;
+            position: relative;
+        }
+
+        .vol-fill {
+            position: absolute;
+            height: 100%;
+            border-radius: 4px;
+        }
+
+        /* ── S7 LIMITS ── */
+        #s7 {
+            background: var(--cream);
+        }
+
+        #s8 {
+            background: var(--cream);
+        }
+
+        .contrib-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .contrib-item {
+            border-top: 1px solid rgba(255, 255, 255, .1);
+            padding-top: 18px;
+        }
+
+        .contrib-icon {
+            font-size: 18px;
+            margin-bottom: 10px;
+            opacity: .65;
+        }
+
+        .contrib-title {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--cream);
+            margin-bottom: 6px;
+        }
+
+        .contrib-desc {
+            font-size: 12px;
+            color: rgba(245, 240, 232, .4);
+            line-height: 1.6;
+        }
+
+        .limit-section {
+            border-top: 1px solid rgba(255, 255, 255, .08);
+            padding-top: 28px;
+        }
+
+        .limit-label {
+            font-family: var(--mono);
+            font-size: 9px;
+            letter-spacing: .2em;
+            color: rgba(255, 255, 255, .22);
+            text-transform: uppercase;
+            margin-bottom: 14px;
+        }
+
+        .limit-row {
+            display: flex;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+
+        .limit-item {
+            font-size: 12px;
+            color: rgba(245, 240, 232, .38);
+            display: flex;
+            gap: 7px;
+            align-items: flex-start;
+            max-width: 260px;
+        }
+
+        .limit-item::before {
+            content: '→';
+            color: rgba(255, 255, 255, .18);
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        /* ── S8 CLOSE ── */
+        #s8 {}
+
+        #s8 .big {
+            font-family: var(--serif);
+            font-size: clamp(30px, 4vw, 56px);
+            line-height: 1.1;
+            max-width: 740px;
+            margin-bottom: 44px;
+        }
+
+        #s8 .big em {
+            font-style: italic;
+            color: var(--accent);
+        }
+
+        .future-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+            margin-bottom: 40px;
+        }
+
+        .future-item {
+            padding: 16px 14px;
+            border: 1px solid var(--rule);
+            border-radius: 4px;
+        }
+
+        .future-phase {
+            font-family: var(--mono);
+            font-size: 9px;
+            letter-spacing: .18em;
+            color: var(--muted);
+            text-transform: uppercase;
+            margin-bottom: 7px;
+        }
+
+        .future-title {
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+
+        .future-desc {
+            font-size: 11px;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        .final-line {
+            border-top: 1px solid var(--rule);
+            padding-top: 24px;
+        }
+
+        .thesis-box {
+            padding: 16px 20px;
+            background: var(--ink);
+            color: var(--cream);
+            border-radius: 4px;
+            max-width: 640px;
+        }
+
+        .thesis-label {
+            font-family: var(--mono);
+            font-size: 9px;
+            letter-spacing: .18em;
+            color: var(--muted);
+            margin-bottom: 6px;
+        }
+
+        .thesis-text {
+            font-size: 13px;
+            line-height: 1.65;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="progress">
+        <div class="progress-fill" id="prog"></div>
+    </div>
+
+    <!-- S1 TITLE -->
+    <section class="slide" id="s1">
+        <div class="bg-grid"></div>
+        <div class="slide-num">01 / 11</div>
+        <div class="eyebrow">AI Co-Founder · Kairos</div>
+        <h1>Run the game<br>before you <em>play it.</em></h1>
+        <p class="subtitle">Kairos — A multi-agent simulation platform for high-stakes decisions</p>
+        <div class="author-line">
+            <span class="name">Gefei Gu</span>
+            <span class="divider"></span>
+            <span class="course">AI Co-Founder · Spring 2026 · CMU</span>
+        </div>
+        <!-- Logo positioned in the right grid area -->
+        <div style="position:absolute; right:8%; top:50%; transform:translateY(-50%); width:180px; opacity:0.82;">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+                <g stroke="#f5f0e8" fill="#f5f0e8">
+                    <line x1="200" y1="170" x2="200" y2="284" stroke-width="8" />
+                    <line x1="200" y1="175" x2="145" y2="284" stroke-width="8" stroke-linecap="round" />
+                    <line x1="200" y1="175" x2="255" y2="284" stroke-width="8" stroke-linecap="round" />
+                    <rect x="140" y="280" width="10" height="8" rx="2" transform="rotate(25, 145, 284)" />
+                    <rect x="250" y="280" width="10" height="8" rx="2" transform="rotate(-25, 255, 284)" />
+                    <rect x="195" y="280" width="10" height="8" rx="2" />
+                    <rect x="182" y="170" width="36" height="8" rx="2" />
+                    <rect x="194" y="150" width="12" height="25" />
+                </g>
+                <g transform="translate(200, 155) rotate(-22)">
+                    <rect x="-10" y="10" width="20" height="10" fill="#f5f0e8" />
+                    <rect x="-105" y="-5" width="15" height="10" fill="#f5f0e8" rx="2" />
+                    <polygon points="-90,-7 -75,-9 -75,9 -90,7" fill="#f5f0e8" />
+                    <polygon points="-73,-9 -20,-12 -20,12 -73,9" fill="#f5f0e8" />
+                    <polygon points="-18,-12 50,-16 50,16 -18,12" fill="#f5f0e8" />
+                    <polygon points="52,-16 95,-22 95,22 52,16" fill="#f5f0e8" />
+                    <ellipse cx="95" cy="0" rx="4.5" ry="22" fill="#1a1612" stroke="#f5f0e8" stroke-width="2" />
+                </g>
+                <path d="M 40 290 Q 200 270 360 290 Q 200 280 40 290 Z" fill="#f5f0e8" opacity="0.3" />
+                <text x="205" y="350" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="44"
+                    font-weight="bold" letter-spacing="14" text-anchor="middle" fill="#f5f0e8">KAIROS</text>
+            </svg>
+        </div>
+    </section>
+
+    <!-- S2 SCENARIO -->
+    <section class="slide" id="s2">
+        <div class="slide-num">02 / 11</div>
+        <div class="slide-label">The Setting</div>
+        <h2>Imagine you are a<br>global macro trader.</h2>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start;margin-bottom:40px;">
+            <div>
+                <div
+                    style="font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:var(--muted);margin-bottom:20px;">
+                    THE SITUATION</div>
+                <div style="display:flex;flex-direction:column;gap:16px;">
+                    <div style="display:flex;gap:14px;align-items:flex-start;">
+                        <div
+                            style="font-family:var(--mono);font-size:11px;color:var(--accent);flex-shrink:0;margin-top:2px;">
+                            01</div>
+                        <p style="font-size:14px;color:var(--ink2);line-height:1.6;">A major power launches strikes on a
+                            regional adversary. The adversary retaliates by closing a critical strait — <strong>20% of
+                                global oil supply</strong>, gone overnight.</p>
+                    </div>
+                    <div style="display:flex;gap:14px;align-items:flex-start;">
+                        <div
+                            style="font-family:var(--mono);font-size:11px;color:var(--accent);flex-shrink:0;margin-top:2px;">
+                            02</div>
+                        <p style="font-size:14px;color:var(--ink2);line-height:1.6;">You hold positions across energy,
+                            defense, and emerging markets. Three expert reports land on your desk. Three different
+                            conclusions.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <div
+                    style="font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:var(--muted);margin-bottom:20px;">
+                    WHAT YOU NEED TO KNOW</div>
+                <div style="display:flex;flex-direction:column;gap:10px;">
+                    <div style="border-left:2px solid var(--rule);padding:10px 16px;">
+                        <div style="font-size:13px;color:var(--ink2);line-height:1.5;">Will the strait reopen in weeks —
+                            or months?</div>
+                    </div>
+                    <div style="border-left:2px solid var(--rule);padding:10px 16px;">
+                        <div style="font-size:13px;color:var(--ink2);line-height:1.5;">Do proxies escalate further?
+                        </div>
+                    </div>
+                    <div style="border-left:2px solid var(--rule);padding:10px 16px;">
+                        <div style="font-size:13px;color:var(--ink2);line-height:1.5;">Will major powers intervene — or
+                            block it?</div>
+                    </div>
+                    <div style="border-left:2px solid var(--gold);padding:10px 16px;background:rgba(183,134,11,0.05);">
+                        <div style="font-size:13px;color:var(--ink2);line-height:1.5;">What does your oil exposure look
+                            like under each path?</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="pull-quote">
+            None of your existing tools can answer these.<br>They were built for <strong>stable data</strong> — not
+            <strong>live multi-party games</strong>.
+        </div>
+    </section>
+
+    <!-- S3 PROBLEM -->
+    <section class="slide" id="s3old">
+        <div class="slide-num">03 / 11</div>
+        <div class="slide-label">The Problem</div>
+        <h2>Every existing forecasting tool<br>breaks down under complex,<br>multi-party dynamics</h2>
+        <div class="comparison-grid">
+            <div class="comp-cell">
+                <div class="method">Expert Judgment</div>
+                <div class="answer" style="color:var(--muted)">Experience-Dependent</div>
+                <div class="caveat">Conclusions are hard to reproduce, hidden assumptions go untested, experts routinely
+                    disagree</div>
+            </div>
+            <div class="comp-cell">
+                <div class="method">Prediction Markets</div>
+                <div class="answer" style="color:var(--gold)">Sentiment-Driven</div>
+                <div class="caveat">Lack strategic game-theoretic logic, easily distorted by short-term signals,
+                    reasoning is unauditable</div>
+            </div>
+            <div class="comp-cell highlight">
+                <div class="method">Quantitative Models</div>
+                <div class="answer" style="color:var(--accent)">History Fails Here</div>
+                <div class="caveat">Extreme events have sparse historical data; nonlinear escalation paths exceed model
+                    boundaries</div>
+            </div>
+        </div>
+        <div class="pull-quote">Every existing method uses <strong>static data</strong> to predict <strong>dynamic
+                games</strong> — a fundamental methodological flaw.<br><span style="font-size:14px;opacity:.6">e.g.
+                Geopolitical conflict / Regulatory battles / Supply chain disruption</span></div>
+    </section>
+
+    <!-- S4 BRIDGE -->
+    <section class="slide" id="s4">
+        <div class="slide-num">04 / 11</div>
+        <div class="slide-label">The Step 5 Problem</div>
+        <h2>The outcome that matters<br>is invisible at step 1.</h2>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-bottom:48px;max-width:720px;">
+            <div style="border-top:3px solid var(--muted);padding-top:20px;">
+                <div
+                    style="font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:var(--muted);margin-bottom:16px;">
+                    HUMAN ANALYST</div>
+                <div style="display:flex;align-items:center;gap:0;margin-bottom:14px;">
+                    <div style="text-align:center;width:48px;">
+                        <div
+                            style="width:36px;height:36px;border-radius:50%;background:var(--rule);margin:0 auto 6px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:11px;color:var(--ink2);">
+                            1</div>
+                    </div>
+                    <div style="flex:1;height:2px;background:var(--rule);"></div>
+                    <div style="text-align:center;width:48px;">
+                        <div
+                            style="width:36px;height:36px;border-radius:50%;background:var(--rule);margin:0 auto 6px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:11px;color:var(--ink2);">
+                            2</div>
+                    </div>
+                    <div style="flex:1;height:2px;background:var(--rule);"></div>
+                    <div style="text-align:center;width:48px;">
+                        <div
+                            style="width:36px;height:36px;border-radius:50%;background:var(--rule);margin:0 auto 6px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:11px;color:var(--ink2);">
+                            3</div>
+                    </div>
+                    <div
+                        style="flex:1;height:2px;background:var(--rule);opacity:.3;border-top:2px dashed var(--rule);height:0;">
+                    </div>
+                    <div style="text-align:center;width:48px;">
+                        <div
+                            style="width:36px;height:36px;border-radius:50%;border:2px dashed var(--rule);margin:0 auto 6px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:11px;color:var(--muted);">
+                            ?</div>
+                    </div>
+                </div>
+                <div style="font-size:13px;color:var(--muted);line-height:1.6;">Cognitive load limit hit around step 3.
+                    Analysis stops. Outcome assumed.</div>
+            </div>
+
+            <div style="border-top:3px solid var(--accent2);padding-top:20px;">
+                <div
+                    style="font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:var(--accent2);margin-bottom:16px;">
+                    KAIROS</div>
+                <div style="display:flex;align-items:center;gap:0;margin-bottom:14px;">
+                    <div style="text-align:center;width:36px;">
+                        <div
+                            style="width:28px;height:28px;border-radius:50%;background:var(--rule);margin:0 auto 4px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:10px;color:var(--ink2);">
+                            1</div>
+                    </div>
+                    <div style="flex:1;height:2px;background:var(--rule);"></div>
+                    <div style="text-align:center;width:36px;">
+                        <div
+                            style="width:28px;height:28px;border-radius:50%;background:var(--rule);margin:0 auto 4px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:10px;color:var(--ink2);">
+                            2</div>
+                    </div>
+                    <div style="flex:1;height:2px;background:var(--rule);"></div>
+                    <div style="text-align:center;width:36px;">
+                        <div
+                            style="width:28px;height:28px;border-radius:50%;background:var(--rule);margin:0 auto 4px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:10px;color:var(--ink2);">
+                            3</div>
+                    </div>
+                    <div style="flex:1;height:2px;background:var(--rule);"></div>
+                    <div style="text-align:center;width:36px;">
+                        <div
+                            style="width:28px;height:28px;border-radius:50%;background:var(--rule);margin:0 auto 4px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:10px;color:var(--ink2);">
+                            4</div>
+                    </div>
+                    <div style="flex:1;height:2px;background:var(--accent2);"></div>
+                    <div style="text-align:center;width:36px;">
+                        <div
+                            style="width:28px;height:28px;border-radius:50%;background:var(--accent2);margin:0 auto 4px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:10px;color:white;">
+                            5</div>
+                    </div>
+                    <div style="flex:1;height:2px;background:var(--accent2);"></div>
+                    <div style="text-align:center;width:36px;">
+                        <div
+                            style="width:28px;height:28px;border-radius:50%;background:var(--accent2);margin:0 auto 4px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:10px;color:white;">
+                            6</div>
+                    </div>
+                </div>
+                <div style="font-size:13px;color:var(--ink2);line-height:1.6;">Runs mechanically to step 6, 8, 10. The
+                    escalation spiral — only visible at step 5 — becomes explicit.</div>
+            </div>
+        </div>
+
+        <div class="pull-quote" style="max-width:560px;">
+            Static analysis labels step 1 a success.<br>The real outcome is hiding at step 5.
+        </div>
+    </section>
+
+    <!-- S5 CHESS ANALOGY -->
+    <section class="slide" id="s3">
+        <div class="slide-num">05 / 11</div>
+        <div class="slide-label">Core Analogy</div>
+        <h2>This isn't forecasting.<br>It's playing out <em style="font-style:italic;color:var(--accent2)">every
+                variation of the game</em></h2>
+
+        <div class="analogy-split">
+            <div class="analogy-card">
+                <div class="analogy-card-head">
+                    <div class="icon">♟</div>
+                    <div class="title">How AlphaGo works</div>
+                    <span class="badge badge-old">Board Game</span>
+                </div>
+                <div class="analogy-card-body">
+                    <div class="analogy-row">
+                        <div class="dot green"></div>Simulates millions of possible move sequences
+                    </div>
+                    <div class="analogy-row">
+                        <div class="dot green"></div>Each move accounts for the opponent's optimal response
+                    </div>
+                    <div class="analogy-row">
+                        <div class="dot green"></div>Deeper lookahead reveals traps humans miss
+                    </div>
+                    <div class="analogy-row">
+                        <div class="dot red"></div>Fixed rules, closed board, enumerable state space
+                    </div>
+                </div>
+            </div>
+            <div class="analogy-card">
+                <div class="analogy-card-head">
+                    <div class="icon">🌐</div>
+                    <div class="title">How Kairos works</div>
+                    <span class="badge badge-new">Real World</span>
+                </div>
+                <div class="analogy-card-body">
+                    <div class="analogy-row">
+                        <div class="dot green"></div>LLM agents roleplay each decision-maker in the game
+                    </div>
+                    <div class="analogy-row">
+                        <div class="dot green"></div>Each agent updates its strategy based on prior round outcomes
+                    </div>
+                    <div class="analogy-row">
+                        <div class="dot green"></div>Multi-round simulation surfaces consequences invisible at step 1
+                    </div>
+                    <div class="analogy-row">
+                        <div class="dot red"></div>Rules are fuzzy, state space is infinite — that's precisely the value
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="insight-strip">
+            <div class="insight-cell">
+                <div class="n" style="color:var(--accent2)">Depth</div>
+                <div class="t">Multi-round iteration</div>
+                <div class="d">Each round's output feeds the next, simulating path dependency and escalation spirals
+                </div>
+            </div>
+            <div class="insight-cell">
+                <div class="n" style="color:var(--gold)">Breadth</div>
+                <div class="t">Monte Carlo sampling</div>
+                <div class="d">Random perturbations injected; same starting point runs 500 times to map all viable paths
+                </div>
+            </div>
+            <div class="insight-cell">
+                <div class="n" style="color:var(--accent)">Transparency</div>
+                <div class="t">Full decision audit trail</div>
+                <div class="d">Every outcome is backed by a complete agent conversation log — every assumption is
+                    inspectable</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- S5 AGENT CASCADE -->
+    <section class="slide" id="s5">
+        <div class="slide-num">06 / 11</div>
+        <div class="slide-label">Multi-Agent Decision Cascade</div>
+        <h2>Every agent's move depends on<br>what every other agent just did</h2>
+        <div style="margin-top:-8px">
+            <style>
+                .casc-bar {
+                    display: flex;
+                    align-items: center;
+                    gap: 7px;
+                    margin-bottom: 11px;
+                    flex-wrap: wrap
+                }
+
+                .casc-pill {
+                    font-size: 10px;
+                    padding: 2px 9px;
+                    border-radius: 20px;
+                    background: #f0ece3;
+                    color: var(--muted);
+                    border: 1px solid var(--rule);
+                    cursor: pointer;
+                    font-family: var(--mono);
+                    letter-spacing: .06em;
+                    transition: all .15s
+                }
+
+                .casc-pill.casc-lit {
+                    background: var(--ink);
+                    color: var(--cream);
+                    border-color: var(--ink)
+                }
+
+                .casc-pill.casc-warn {
+                    background: var(--accent);
+                    color: var(--cream);
+                    border-color: var(--accent)
+                }
+
+                .casc-btn {
+                    font-size: 11px;
+                    padding: 3px 11px;
+                    border: 1px solid var(--rule);
+                    border-radius: 3px;
+                    background: transparent;
+                    color: var(--ink2);
+                    cursor: pointer;
+                    font-family: var(--mono)
+                }
+
+                .casc-btn:hover {
+                    background: var(--ink);
+                    color: var(--cream)
+                }
+
+                .casc-grid {
+                    position: relative;
+                    overflow-x: auto
+                }
+
+                .casc-inner {
+                    min-width: 760px
+                }
+
+                .casc-svg {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    pointer-events: none;
+                    overflow: visible
+                }
+
+                .casc-row {
+                    display: flex;
+                    align-items: stretch;
+                    margin-bottom: 3px
+                }
+
+                .casc-actor {
+                    width: 88px;
+                    flex-shrink: 0;
+                    display: flex;
+                    align-items: center;
+                    padding-right: 6px
+                }
+
+                .casc-badge {
+                    font-size: 9px;
+                    font-weight: 500;
+                    padding: 4px 6px;
+                    border-radius: 3px;
+                    line-height: 1.3;
+                    text-align: center;
+                    width: 100%;
+                    background: #f0ece3;
+                    color: var(--ink2);
+                    border: 1px solid var(--rule);
+                    font-family: var(--mono)
+                }
+
+                .casc-cells {
+                    display: flex;
+                    gap: 3px
+                }
+
+                .casc-cell {
+                    width: 116px;
+                    flex-shrink: 0;
+                    min-height: 68px;
+                    border-radius: 3px;
+                    border: 1px solid var(--rule);
+                    background: #f8f5ef;
+                    padding: 6px 8px;
+                    transition: opacity .22s, border-color .22s
+                }
+
+                .casc-cell.casc-dim {
+                    opacity: .08
+                }
+
+                .casc-cell.casc-lit {
+                    opacity: 1
+                }
+
+                .casc-cell.casc-hot {
+                    border: 1.5px solid var(--accent) !important
+                }
+
+                .casc-cell.casc-end {
+                    border: 1.5px solid var(--accent2) !important
+                }
+
+                .casc-r {
+                    font-size: 9px;
+                    color: var(--muted);
+                    font-family: var(--mono);
+                    margin-bottom: 2px
+                }
+
+                .casc-body {
+                    font-size: 10px;
+                    color: var(--ink2);
+                    line-height: 1.4
+                }
+
+                .casc-tag {
+                    display: inline-block;
+                    font-size: 9px;
+                    padding: 1px 5px;
+                    border-radius: 2px;
+                    margin-top: 4px;
+                    font-family: var(--mono);
+                    background: transparent;
+                    border: 1px solid var(--rule);
+                    color: var(--muted)
+                }
+
+                .casc-tag.r {
+                    border-color: var(--accent);
+                    color: var(--accent)
+                }
+
+                .casc-tag.a {
+                    border-color: var(--gold);
+                    color: var(--gold)
+                }
+
+                .casc-tag.g {
+                    border-color: var(--accent2);
+                    color: var(--accent2)
+                }
+
+                .casc-tag.b {
+                    border-color: var(--accent3);
+                    color: var(--accent3)
+                }
+
+                .casc-tag.p {
+                    border-color: #7f77dd;
+                    color: #534ab7
+                }
+
+                .casc-note {
+                    margin-top: 8px;
+                    padding: 7px 11px;
+                    border-radius: 3px;
+                    background: #f0ece3;
+                    border: 1px solid var(--rule);
+                    font-size: 11px;
+                    color: var(--ink2);
+                    line-height: 1.55;
+                    font-style: italic
+                }
+
+                .casc-leg {
+                    display: flex;
+                    gap: 14px;
+                    margin-top: 8px;
+                    flex-wrap: wrap
+                }
+
+                .casc-li {
+                    display: flex;
+                    align-items: center;
+                    gap: 5px;
+                    font-size: 10px;
+                    color: var(--muted);
+                    font-family: var(--mono)
+                }
+
+                .casc-lline {
+                    width: 18px;
+                    height: 1.5px;
+                    border-radius: 1px
+                }
+
+                .casc-ldash {
+                    width: 18px;
+                    height: 0;
+                    border-top: 1.5px dashed
+                }
+            </style>
+
+            <div class="casc-bar">
+                <span style="font-size:11px;color:var(--muted);font-family:var(--mono)">Round</span>
+                <span class="casc-pill" id="cp0" data-r="0">All</span>
+                <span class="casc-pill" id="cp1" data-r="1">R1</span>
+                <span class="casc-pill" id="cp2" data-r="2">R2</span>
+                <span class="casc-pill" id="cp3" data-r="3">R3</span>
+                <span class="casc-pill casc-warn" id="cp4" data-r="4">R4 ⚠</span>
+                <span class="casc-pill" id="cp5" data-r="5">R5</span>
+                <span class="casc-pill" id="cp6" data-r="6">R6</span>
+                <button class="casc-btn" id="cascPlayBtn" onclick="cascTogglePlay()">▶ Play</button>
+            </div>
+
+            <div class="casc-grid">
+                <div class="casc-inner" id="casc-inner">
+                    <svg class="casc-svg" id="casc-svg"></svg>
+
+                    <div class="casc-row">
+                        <div class="casc-actor"><span class="casc-badge">Party A · Dominant</span></div>
+                        <div class="casc-cells">
+                            <div class="casc-cell casc-dim" id="cu1" data-r="1">
+                                <div class="casc-r">R1</div>
+                                <div class="casc-body">Large-scale strikes. "Limited action." Expects swift end.</div>
+                                <span class="casc-tag r">Strike</span>
+                            </div>
+                            <div class="casc-cell casc-dim" id="cu2" data-r="2">
+                                <div class="casc-r">R2</div>
+                                <div class="casc-body">Continues strikes. Opens talks. Sets ultimatum on strait.</div>
+                                <span class="casc-tag a">Pressure</span>
+                            </div>
+                            <div class="casc-cell casc-dim" id="cu3" data-r="3">
+                                <div class="casc-r">R3</div>
+                                <div class="casc-body">Allies refuse. Acts alone. Costs exceed projections.</div><span
+                                    class="casc-tag r">Isolated</span>
+                            </div>
+                            <div class="casc-cell casc-dim casc-hot" id="cu4" data-r="4">
+                                <div class="casc-r">R4 ⚠</div>
+                                <div class="casc-body">Talks fail. 48-hr ultimatum: open strait or infra struck.</div>
+                                <span class="casc-tag r">Ultimatum</span>
+                            </div>
+                            <div class="casc-cell casc-dim" id="cu5" data-r="5">
+                                <div class="casc-r">R5</div>
+                                <div class="casc-body">Ceasefire agreed. Port blockade launched simultaneously.</div>
+                                <span class="casc-tag a">Ceasefire+</span>
+                            </div>
+                            <div class="casc-cell casc-dim casc-end" id="cu6" data-r="6">
+                                <div class="casc-r">R6</div>
+                                <div class="casc-body">Blockade holds. Strait still closed.</div><span
+                                    class="casc-tag g">Standoff</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="casc-row">
+                        <div class="casc-actor"><span class="casc-badge">Party B · Challenger</span></div>
+                        <div class="casc-cells">
+                            <div class="casc-cell casc-dim" id="ci1" data-r="1">
+                                <div class="casc-r">R1</div>
+                                <div class="casc-body">Immediate retaliation. Strait closed. Asymmetric response.</div>
+                                <span class="casc-tag r">Retaliate</span>
+                            </div>
+                            <div class="casc-cell casc-dim" id="ci2" data-r="2">
+                                <div class="casc-r">R2</div>
+                                <div class="casc-body">~20 ship attacks. Mines laid. Oil prices spike.</div><span
+                                    class="casc-tag r">Blockade</span>
+                            </div>
+                            <div class="casc-cell casc-dim" id="ci3" data-r="3">
+                                <div class="casc-r">R3</div>
+                                <div class="casc-body">Leaders targeted. Retaliates. Threatens civilian infra.</div>
+                                <span class="casc-tag r">Escalate</span>
+                            </div>
+                            <div class="casc-cell casc-dim casc-hot" id="ci4" data-r="4">
+                                <div class="casc-r">R4 ⚠</div>
+                                <div class="casc-body">Signals conditions. Strait = last bargaining chip.</div><span
+                                    class="casc-tag a">Leverage</span>
+                            </div>
+                            <div class="casc-cell casc-dim" id="ci5" data-r="5">
+                                <div class="casc-r">R5</div>
+                                <div class="casc-body">Accepts ceasefire. Demands coordination fees to transit.</div>
+                                <span class="casc-tag a">Conditional</span>
+                            </div>
+                            <div class="casc-cell casc-dim casc-end" id="ci6" data-r="6">
+                                <div class="casc-r">R6</div>
+                                <div class="casc-body">Retains closure as leverage. Zero traffic.</div><span
+                                    class="casc-tag a">Hold</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="casc-row">
+                        <div class="casc-actor"><span class="casc-badge">Proxies</span></div>
+                        <div class="casc-cells">
+                            <div class="casc-cell casc-dim" id="ch1" data-r="1">
+                                <div class="casc-r">R1</div>
+                                <div class="casc-body">Warn: escalation triggers secondary front activation.</div><span
+                                    class="casc-tag a">Warn</span>
+                            </div>
+                            <div class="casc-cell casc-dim" id="ch2" data-r="2">
+                                <div class="casc-r">R2</div>
+                                <div class="casc-body">Second chokepoint disrupted. Dual-blockade risk priced in.</div>
+                                <span class="casc-tag r">Activate</span>
+                            </div>
+                            <div class="casc-cell casc-dim" id="ch3" data-r="3">
+                                <div class="casc-r">R3</div>
+                                <div class="casc-body">Northern front opened. Three vectors simultaneously.</div><span
+                                    class="casc-tag r">Multi-front</span>
+                            </div>
+                            <div class="casc-cell casc-dim casc-hot" id="ch4" data-r="4">
+                                <div class="casc-r">R4 ⚠</div>
+                                <div class="casc-body">Direct strikes. Second strait threatened. Dual blockade.</div>
+                                <span class="casc-tag r">New front</span>
+                            </div>
+                            <div class="casc-cell casc-dim" id="ch5" data-r="5">
+                                <div class="casc-r">R5</div>
+                                <div class="casc-body">Nominally in ceasefire. Activity reduced.</div><span
+                                    class="casc-tag a">Pause</span>
+                            </div>
+                            <div class="casc-cell casc-dim casc-end" id="ch6" data-r="6">
+                                <div class="casc-r">R6</div>
+                                <div class="casc-body">Blockade gives proxies renewed pretext.</div><span
+                                    class="casc-tag a">Watch</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="casc-row">
+                        <div class="casc-actor"><span class="casc-badge">Major Powers</span></div>
+                        <div class="casc-cells">
+                            <div class="casc-cell casc-dim" id="cm1" data-r="1">
+                                <div class="casc-r">R1</div>
+                                <div class="casc-body">Condemn strikes. Provide economic lifeline to Party B.</div><span
+                                    class="casc-tag p">Condemn</span>
+                            </div>
+                            <div class="casc-cell casc-dim" id="cm2" data-r="2">
+                                <div class="casc-r">R2</div>
+                                <div class="casc-body">Negotiate preferential passage. Veto UNSC action.</div><span
+                                    class="casc-tag p">Veto</span>
+                            </div>
+                            <div class="casc-cell casc-dim" id="cm3" data-r="3">
+                                <div class="casc-r">R3</div>
+                                <div class="casc-body">Refuse coalition. Block multilateral action.</div><span
+                                    class="casc-tag r">Block</span>
+                            </div>
+                            <div class="casc-cell casc-dim casc-hot" id="cm4" data-r="4">
+                                <div class="casc-r">R4 ⚠</div>
+                                <div class="casc-body">Jointly veto UNSC. Party A diplomatically isolated.</div><span
+                                    class="casc-tag p">Double veto</span>
+                            </div>
+                            <div class="casc-cell casc-dim" id="cm5" data-r="5">
+                                <div class="casc-r">R5</div>
+                                <div class="casc-body">Back-channel mediation via neutral state.</div><span
+                                    class="casc-tag g">Mediate</span>
+                            </div>
+                            <div class="casc-cell casc-dim casc-end" id="cm6" data-r="6">
+                                <div class="casc-r">R6</div>
+                                <div class="casc-body">Condemn port blockade. Own exports disrupted.</div><span
+                                    class="casc-tag r">Condemn</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="casc-row">
+                        <div class="casc-actor"><span class="casc-badge">Intl. Community</span></div>
+                        <div class="casc-cells">
+                            <div class="casc-cell casc-dim" id="ce1" data-r="1">
+                                <div class="casc-r">R1</div>
+                                <div class="casc-body">Defensive support only. Refuse offensive endorsement.</div><span
+                                    class="casc-tag b">Defensive</span>
+                            </div>
+                            <div class="casc-cell casc-dim" id="ce2" data-r="2">
+                                <div class="casc-r">R2</div>
+                                <div class="casc-body">UNSC resolution passed. Propose navigation mission.</div><span
+                                    class="casc-tag b">Diplomatic</span>
+                            </div>
+                            <div class="casc-cell casc-dim" id="ce3" data-r="3">
+                                <div class="casc-r">R3</div>
+                                <div class="casc-body">Allies formally refuse military participation.</div><span
+                                    class="casc-tag a">Refuse</span>
+                            </div>
+                            <div class="casc-cell casc-dim casc-hot" id="ce4" data-r="4">
+                                <div class="casc-r">R4 ⚠</div>
+                                <div class="casc-body">Proposal vetoed. 34 nations willing but no mandate.</div><span
+                                    class="casc-tag a">Stalemate</span>
+                            </div>
+                            <div class="casc-cell casc-dim" id="ce5" data-r="5">
+                                <div class="casc-r">R5</div>
+                                <div class="casc-body">Ceasefire brokered via neutral intermediaries.</div><span
+                                    class="casc-tag g">Broker</span>
+                            </div>
+                            <div class="casc-cell casc-dim casc-end" id="ce6" data-r="6">
+                                <div class="casc-r">R6</div>
+                                <div class="casc-body">Ceasefire fragile. Back-channel ongoing.</div><span
+                                    class="casc-tag g">Hold</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="casc-note" id="casc-note">Select a round to trace decision dependencies. Each agent's move is
+                conditioned on all prior-round outputs — the escalation spiral is invisible at R1.</div>
+
+            <div class="casc-leg">
+                <div class="casc-li">
+                    <div class="casc-lline" style="background:var(--accent3)"></div>Direct response
+                </div>
+                <div class="casc-li">
+                    <div class="casc-lline" style="background:var(--accent)"></div>Triggers escalation
+                </div>
+                <div class="casc-li">
+                    <div class="casc-ldash" style="border-color:#7f77dd"></div>Diplomatic / veto
+                </div>
+                <div class="casc-li">
+                    <div class="casc-ldash" style="border-color:var(--muted)"></div>Indirect influence
+                </div>
+            </div>
+
+            <script>
+                (function () {
+                    const cascNotes = {
+                        0: "Select a round to trace decision dependencies. Each agent's move is conditioned on all prior-round outputs — the escalation spiral is invisible at R1.",
+                        1: "R1: Party A strikes expecting quick resolution. Party B retaliates with full strait closure — an outcome Party A's static analysis underweighted.",
+                        2: "R2: Blockade triggers proxy activation and major-power economic lifeline. Two second-order effects invisible at R1.",
+                        3: "R3: Allies refuse support, isolating Party A. Three proxy fronts open simultaneously. Escalation spiral begins.",
+                        4: "R4 — Escalation peak: Diplomacy fails. Double UNSC veto. New proxy front. Every actor locked in reactive mode. Invisible at R1.",
+                        5: "R5: Ceasefire reached — but port blockade launched simultaneously, destabilising the truce before it takes hold.",
+                        6: "R6: Six rounds in, strait still closed. The R1 'limited action' expectation produced a sustained 5-actor standoff.",
+                    };
+                    const cascArrows = [
+                        { f: 'cu1', t: 'ci1', tp: 'e' }, { f: 'ci1', t: 'cu2', tp: 'r' }, { f: 'ci1', t: 'ch1', tp: 'r' }, { f: 'ci1', t: 'cm1', tp: 'r' }, { f: 'ci1', t: 'ce1', tp: 'r' },
+                        { f: 'ci2', t: 'cu2', tp: 'e' }, { f: 'ch1', t: 'ch2', tp: 'r' }, { f: 'ci2', t: 'cm2', tp: 'r' }, { f: 'ce1', t: 'ce2', tp: 'r' },
+                        { f: 'cu2', t: 'ci3', tp: 'e' }, { f: 'ci3', t: 'cm3', tp: 'r' }, { f: 'cm3', t: 'cu3', tp: 'd' }, { f: 'ce3', t: 'cu3', tp: 'd' },
+                        { f: 'ch2', t: 'ch3', tp: 'r' }, { f: 'ci3', t: 'ch3', tp: 'r' }, { f: 'ch3', t: 'ch4', tp: 'e' },
+                        { f: 'cu3', t: 'cu4', tp: 'r' }, { f: 'ci4', t: 'cu4', tp: 'r' }, { f: 'cm4', t: 'ce4', tp: 'd' },
+                        { f: 'cu4', t: 'ci5', tp: 'r' }, { f: 'ce4', t: 'ce5', tp: 'r' }, { f: 'cm4', t: 'cm5', tp: 'r' },
+                        { f: 'ci5', t: 'cu5', tp: 'r' }, { f: 'ce5', t: 'cu5', tp: 'i' },
+                        { f: 'cu5', t: 'ci6', tp: 'e' }, { f: 'cm6', t: 'cu6', tp: 'd' },
+                    ];
+                    const CC = { e: { s: '#c0392b', d: '' }, r: { s: '#1a5276', d: '' }, d: { s: '#534ab7', d: '5,3' }, i: { s: '#8a8070', d: '4,3' } };
+                    const MM = { e: 'cma', r: 'cmb', d: 'cmd', i: 'cme' };
+                    let cascCur = 0, cascPlaying = false, cascTimer = null;
+                    const rOf = id => { const m = id.match(/(\d)$/); return m ? +m[1] : 0; };
+                    const aOf = id => id.startsWith('cu') ? 0 : id.startsWith('ci') ? 1 : id.startsWith('ch') ? 2 : id.startsWith('cm') ? 3 : 4;
+                    function cpt(el, side, svg) {
+                        const r = el.getBoundingClientRect(), s = svg.getBoundingClientRect();
+                        if (side === 'r') return { x: r.right - s.left - 1, y: r.top + r.height / 2 - s.top };
+                        if (side === 'l') return { x: r.left - s.left + 1, y: r.top + r.height / 2 - s.top };
+                        if (side === 'b') return { x: r.left + r.width / 2 - s.left, y: r.bottom - s.top - 1 };
+                        return { x: r.left + r.width / 2 - s.left, y: r.top - s.top + 1 };
+                    }
+                    function cascDraw(r) {
+                        const svg = document.getElementById('casc-svg');
+                        const inner = document.getElementById('casc-inner');
+                        const rect = inner.getBoundingClientRect();
+                        svg.setAttribute('width', rect.width + 40);
+                        svg.setAttribute('height', rect.height + 40);
+                        svg.innerHTML = `<defs>
+      <marker id="cma" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M1,1 L9,5 L1,9" fill="none" stroke="#c0392b" stroke-width="1.8" stroke-linejoin="round"/></marker>
+      <marker id="cmb" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M1,1 L9,5 L1,9" fill="none" stroke="#1a5276" stroke-width="1.8" stroke-linejoin="round"/></marker>
+      <marker id="cmd" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M1,1 L9,5 L1,9" fill="none" stroke="#534ab7" stroke-width="1.8" stroke-linejoin="round"/></marker>
+      <marker id="cme" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M1,1 L9,5 L1,9" fill="none" stroke="#8a8070" stroke-width="1.8" stroke-linejoin="round"/></marker>
+    </defs>`;
+                        cascArrows.forEach(({ f, t, tp }) => {
+                            const fEl = document.getElementById(f), tEl = document.getElementById(t);
+                            if (!fEl || !tEl) return;
+                            const fr = rOf(f), tr = rOf(t);
+                            if (r !== 0 && (fr > r || tr > r)) return;
+                            const af = aOf(f), at = aOf(t);
+                            const col = CC[tp];
+                            const active = r === 0 || (fr <= r && tr <= r);
+                            const opacity = active ? (r === 0 ? 0.3 : 0.95) : 0.03;
+                            const w = active && r !== 0 ? 2 : 1;
+                            const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                            path.setAttribute('fill', 'none');
+                            path.setAttribute('stroke', col.s);
+                            path.setAttribute('stroke-width', w);
+                            path.setAttribute('opacity', opacity);
+                            if (col.d) path.setAttribute('stroke-dasharray', col.d);
+                            if (active) path.setAttribute('marker-end', `url(#${MM[tp]})`);
+                            let d;
+                            if (af === at) { const p1 = cpt(fEl, 'r', svg), p2 = cpt(tEl, 'l', svg); d = `M${p1.x},${p1.y} L${p2.x},${p2.y}`; }
+                            else if (at > af) { const p1 = cpt(fEl, 'b', svg), p2 = cpt(tEl, 't', svg); d = `M${p1.x},${p1.y} C${p1.x},${p1.y + 16} ${p2.x},${p2.y - 16} ${p2.x},${p2.y}`; }
+                            else { const p1 = cpt(fEl, 't', svg), p2 = cpt(tEl, 'b', svg); d = `M${p1.x},${p1.y} C${p1.x},${p1.y - 16} ${p2.x},${p2.y + 16} ${p2.x},${p2.y}`; }
+                            path.setAttribute('d', d);
+                            svg.appendChild(path);
+                        });
+                    }
+                    function cascSetRound(r) {
+                        cascCur = r;
+                        document.querySelectorAll('.casc-pill').forEach(p => {
+                            const pr = +p.dataset.r;
+                            p.classList.remove('casc-lit', 'casc-warn');
+                            if (pr === r) p.classList.add(r === 4 ? 'casc-warn' : 'casc-lit');
+                        });
+                        document.querySelectorAll('.casc-cell').forEach(c => {
+                            const cr = +c.dataset.r;
+                            c.classList.toggle('casc-dim', r !== 0 && cr > r);
+                            c.classList.toggle('casc-lit', r === 0 || cr <= r);
+                        });
+                        document.getElementById('casc-note').textContent = cascNotes[r] || cascNotes[0];
+                        cascDraw(r);
+                    }
+                    window.cascTogglePlay = function () {
+                        cascPlaying = !cascPlaying;
+                        document.getElementById('cascPlayBtn').textContent = cascPlaying ? '⏸ Pause' : '▶ Play';
+                        if (cascPlaying) {
+                            let r = (cascCur === 0 || cascCur === 6) ? 1 : cascCur;
+                            cascSetRound(r);
+                            cascTimer = setInterval(() => { r = r >= 6 ? 1 : r + 1; cascSetRound(r); }, 1800);
+                        } else clearInterval(cascTimer);
+                    };
+                    document.querySelectorAll('.casc-pill').forEach(p => p.addEventListener('click', () => {
+                        clearInterval(cascTimer); cascPlaying = false;
+                        document.getElementById('cascPlayBtn').textContent = '▶ Play';
+                        cascSetRound(+p.dataset.r);
+                    }));
+                    setTimeout(() => cascSetRound(0), 300);
+                    window.addEventListener('resize', () => cascDraw(cascCur));
+                })();
+            </script>
+        </div>
+    </section>
+
+    <!-- S6 ARCHITECTURE -->
+    <section class="slide" id="s6">
+        <div class="slide-num">07 / 11</div>
+        <div class="slide-label">Architecture</div>
+        <h2>Four steps make one full simulation run.<br>Repeat N times to get a distribution.</h2>
+        <div class="arch-flow">
+            <div class="arch-step">
+                <div class="step-n">Step 01</div>
+                <div class="step-title">Actor Modeling</div>
+                <div class="step-desc">Write a system prompt for each decision-maker: objective function, resource
+                    constraints, and non-negotiable red lines</div>
+                <span class="step-tag tag-llm">LLM Prompt</span>
+            </div>
+            <div class="arch-step">
+                <div class="step-n">Step 02</div>
+                <div class="step-title">Multi-Round Interaction</div>
+                <div class="step-desc">Agents take turns outputting decisions; a referee agent updates world state and
+                    injects random events; repeat 8–12 rounds</div>
+                <span class="step-tag tag-sys">Multi-Agent Loop</span>
+            </div>
+            <div class="arch-step">
+                <div class="step-n">Step 03</div>
+                <div class="step-title">Outcome Extraction</div>
+                <div class="step-desc">Structured extraction of each round's result: tension level / duration / key
+                    nodes that triggered escalation</div>
+                <span class="step-tag tag-data">JSON Output</span>
+            </div>
+            <div class="arch-step">
+                <div class="step-n">Step 04</div>
+                <div class="step-title">Monte Carlo Aggregation</div>
+                <div class="step-desc">Aggregate 500 runs to generate probability distributions, path clustering, and
+                    sensitivity analysis</div>
+                <span class="step-tag tag-data">Statistics</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- S6 OUTPUT -->
+    <section class="slide" id="s6">
+        <div class="slide-num">08 / 11</div>
+        <div class="slide-label">System Output</div>
+        <h2>After 500 runs, you get<br>a probability map — not a point forecast</h2>
+        <div class="output-grid">
+            <div class="output-card">
+                <div class="output-card-header"><span>Outcome probability distribution (geopolitical conflict
+                        scenario)</span><span>N = 500 runs</span></div>
+                <div class="output-card-body">
+                    <div class="dist-bar-row">
+                        <div class="dist-bar-label">Quick resolution</div>
+                        <div class="dist-bar-track">
+                            <div class="dist-bar-fill bar-a" style="width:34%"><span class="dist-bar-pct">34%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dist-bar-row">
+                        <div class="dist-bar-label">Prolonged attrition</div>
+                        <div class="dist-bar-track">
+                            <div class="dist-bar-fill bar-b" style="width:47%"><span class="dist-bar-pct">47%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dist-bar-row">
+                        <div class="dist-bar-label">Scope expansion</div>
+                        <div class="dist-bar-track">
+                            <div class="dist-bar-fill bar-c" style="width:14%"><span class="dist-bar-pct">14%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dist-bar-row">
+                        <div class="dist-bar-label">Negotiated settlement</div>
+                        <div class="dist-bar-track">
+                            <div class="dist-bar-fill" style="width:5%;background:rgba(26,82,118,.15)"><span
+                                    class="dist-bar-pct" style="color:var(--accent3)">5%</span></div>
+                        </div>
+                    </div>
+                    <div class="dist-n">Simulated data · Framework illustration</div>
+                </div>
+            </div>
+            <div class="output-card">
+                <div class="output-card-header"><span>Linked risk indicator volatility range</span><span>P10 —
+                        P90</span></div>
+                <div class="output-card-body">
+                    <div class="vol-row">
+                        <div class="vol-asset">Crude Oil</div>
+                        <div class="vol-minl">+25%</div>
+                        <div class="vol-range">
+                            <div class="vol-fill"
+                                style="left:15%;width:70%;background:linear-gradient(90deg,rgba(44,110,73,.3),rgba(192,57,43,.4));border-radius:4px">
+                            </div>
+                        </div>
+                        <div class="vol-maxl">+110%</div>
+                    </div>
+                    <div class="vol-row">
+                        <div class="vol-asset">Gold</div>
+                        <div class="vol-minl">+5%</div>
+                        <div class="vol-range">
+                            <div class="vol-fill"
+                                style="left:20%;width:45%;background:linear-gradient(90deg,rgba(44,110,73,.3),rgba(183,134,11,.4));border-radius:4px">
+                            </div>
+                        </div>
+                        <div class="vol-maxl">+38%</div>
+                    </div>
+                    <div class="vol-row">
+                        <div class="vol-asset">Equities</div>
+                        <div class="vol-minl" style="color:var(--accent)">−40%</div>
+                        <div class="vol-range">
+                            <div class="vol-fill"
+                                style="left:5%;width:50%;background:linear-gradient(90deg,rgba(192,57,43,.5),rgba(192,57,43,.1));border-radius:4px">
+                            </div>
+                        </div>
+                        <div class="vol-maxl">−8%</div>
+                    </div>
+                    <div class="vol-row">
+                        <div class="vol-asset">Defense</div>
+                        <div class="vol-minl">+18%</div>
+                        <div class="vol-range">
+                            <div class="vol-fill"
+                                style="left:25%;width:55%;background:linear-gradient(90deg,rgba(44,110,73,.3),rgba(44,110,73,.6));border-radius:4px">
+                            </div>
+                        </div>
+                        <div class="vol-maxl">+75%</div>
+                    </div>
+                    <div class="dist-n">Weighted by scenario distribution · Framework illustration</div>
+                </div>
+            </div>
+        </div>
+        <div class="pull-quote" style="border-color:var(--accent2)">
+            This is not a point prediction. It's an <strong>interpretable probability map</strong> — every path is
+            backed by a full agent decision trace that can be audited and challenged.
+        </div>
+    </section>
+
+    <!-- S8 PRIOR WORK -->
+    <section class="slide" id="s8pw">
+        <div class="slide-num">09 / 11</div>
+        <div class="slide-label">We've Built This Before</div>
+        <h2>Prior work validates<br>the core mechanism.</h2>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-bottom:36px;">
+
+            <!-- Finding -->
+            <div>
+                <div
+                    style="font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:var(--muted);margin-bottom:18px;">
+                    POLYMARKET FORECASTING · CMU · 2025</div>
+                <p style="font-size:14px;color:var(--ink2);line-height:1.7;margin-bottom:14px;">We built a multi-agent
+                    forecasting system on 500 real-world prediction market questions.</p>
+                <p style="font-size:14px;color:var(--ink2);line-height:1.7;">The gain didn't come from more agents — it
+                    came from <strong>how information was allocated across them</strong>. Agents with overlapping
+                    evidence just herded. Agents with complementary evidence genuinely revised.</p>
+            </div>
+
+            <!-- Numbers -->
+            <div style="display:flex;flex-direction:column;gap:10px;">
+                <div
+                    style="font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:var(--muted);margin-bottom:4px;">
+                    POLYGYM BENCHMARK · N = 500</div>
+
+                <div style="border:1px solid var(--rule);border-radius:4px;padding:14px 18px;">
+                    <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-bottom:6px;">SINGLE
+                        AGENT</div>
+                    <div style="display:flex;align-items:baseline;gap:10px;">
+                        <span style="font-family:var(--serif);font-size:34px;color:var(--muted)">71.6%</span>
+                        <span style="font-size:12px;color:var(--muted)">accuracy</span>
+                    </div>
+                </div>
+
+                <div style="border:1px solid var(--accent2);border-radius:4px;padding:14px 18px;background:#f4faf6;">
+                    <div style="font-family:var(--mono);font-size:10px;color:var(--accent2);margin-bottom:6px;">
+                        MULTI-AGENT</div>
+                    <div style="display:flex;align-items:baseline;gap:10px;">
+                        <span style="font-family:var(--serif);font-size:34px;color:var(--accent2)">78.2%</span>
+                        <span style="font-size:12px;color:var(--accent2)">accuracy</span>
+                        <span
+                            style="font-family:var(--mono);font-size:12px;color:var(--accent2);margin-left:auto;">+6.6pp</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="pull-quote" style="border-color:var(--accent2)">
+            Structure beats scale. Kairos is built on the same principle — each agent holds a <strong>distinct role,
+                distinct constraints, distinct information</strong>.
+        </div>
+    </section>
+
+    <!-- S7 CLOSE -->
+    <section class="slide" id="s7">
+        <div class="slide-num">10 / 11</div>
+        <div class="slide-label">What's Next</div>
+        <h2>Possible Use Cases</h2>
+        <div class="future-grid">
+            <div class="future-item">
+                <div class="future-phase">Use Case · 01</div>
+                <div class="future-title">Geopolitical Conflict</div>
+                <div class="future-desc">Walk every escalation path before committing a position — with linked energy
+                    and market impact ranges</div>
+            </div>
+            <div class="future-item">
+                <div class="future-phase">Use Case · 02</div>
+                <div class="future-title">Product Launch</div>
+                <div class="future-desc">Simulate competitor responses, channel negotiations, and regulatory review
+                    across multiple rounds — before you ship</div>
+            </div>
+            <div class="future-item">
+                <div class="future-phase">Use Case · 03</div>
+                <div class="future-title">M&A Negotiation</div>
+                <div class="future-desc">Model the target board, rival bidders, and regulators as agents — find the
+                    optimal offer before the room fills up</div>
+            </div>
+        </div>
+        <div style="margin-top:8px;font-family:var(--serif);font-size:18px;font-style:italic;color:var(--muted);">
+            Run the game before you play it.
+        </div>
+    </section>
+
+    <!-- S9 TARGET CUSTOMER -->
+    <section class="slide" id="s8">
+        <div class="slide-num">11 / 11</div>
+        <div class="slide-label">Who We Serve</div>
+        <h2>Target Customers</h2>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+
+            <!-- Hedge Fund -->
+            <div style="border:1px solid var(--rule);border-radius:4px;overflow:hidden;">
+                <div style="background:#7a4f1a;color:var(--cream);padding:16px 22px;">
+                    <div
+                        style="font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:rgba(245,240,232,.55);margin-bottom:8px;">
+                        CUSTOMER 01</div>
+                    <div style="font-family:var(--serif);font-size:28px;">Hedge Funds</div>
+                    <div style="font-size:12px;color:rgba(245,240,232,.6);margin-top:4px;">Global macro · geopolitical
+                        risk desks</div>
+                </div>
+                <div style="padding:20px 22px;">
+                    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px;">
+                        <div style="font-size:13px;color:var(--ink2);display:flex;gap:8px;"><span
+                                style="color:var(--accent);flex-shrink:0;">→</span>Tail risks are systematically
+                            underpriced</div>
+                        <div style="font-size:13px;color:var(--ink2);display:flex;gap:8px;"><span
+                                style="color:var(--accent);flex-shrink:0;">→</span>Expert reports give point forecasts,
+                            no path reasoning</div>
+                    </div>
+                    <div
+                        style="border-top:1px solid var(--rule);padding-top:14px;font-size:13px;color:var(--ink);line-height:1.6;">
+                        Kairos delivers <strong>outcome distributions with linked asset ranges</strong> — ready for
+                        position sizing.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Strategy Consulting -->
+            <div style="border:1px solid var(--rule);border-radius:4px;overflow:hidden;">
+                <div style="background:var(--accent3);color:var(--cream);padding:16px 22px;">
+                    <div
+                        style="font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:rgba(245,240,232,.5);margin-bottom:8px;">
+                        CUSTOMER 02</div>
+                    <div style="font-family:var(--serif);font-size:28px;">Strategy Consultants</div>
+                    <div style="font-size:12px;color:rgba(245,240,232,.6);margin-top:4px;">McKinsey · BCG · boutique
+                        risk firms</div>
+                </div>
+                <div style="padding:20px 22px;">
+                    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px;">
+                        <div style="font-size:13px;color:var(--ink2);display:flex;gap:8px;"><span
+                                style="color:var(--accent3);flex-shrink:0;">→</span>Clients want dynamic analysis; they
+                            get 3 static slides</div>
+                        <div style="font-size:13px;color:var(--ink2);display:flex;gap:8px;"><span
+                                style="color:var(--accent3);flex-shrink:0;">→</span>Hidden assumptions are never made
+                            explicit or auditable</div>
+                    </div>
+                    <div
+                        style="border-top:1px solid var(--rule);padding-top:14px;font-size:13px;color:var(--ink);line-height:1.6;">
+                        Kairos turns "our analysis suggests" into <strong>500 simulated paths with full decision
+                            traces.</strong>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- S9 THANKS / QA -->
+    <section class="slide" id="s9">
+        <div class="slide-num">11 / 11</div>
+        <div
+            style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;">
+            <div
+                style="font-family:var(--mono);font-size:11px;letter-spacing:.25em;color:var(--muted);text-transform:uppercase;margin-bottom:32px;">
+                Thank You</div>
+            <div
+                style="font-family:var(--serif);font-size:clamp(52px,7vw,88px);line-height:1.05;color:var(--ink);margin-bottom:40px;">
+                Q & A</div>
+            <div style="width:48px;height:1px;background:var(--rule);margin:0 auto 40px;"></div>
+            <div style="font-size:14px;color:var(--muted);line-height:1.8;font-family:var(--mono);">
+                Kairos<br>
+                Gefei Gu · AI Co-Founder · CMU
+            </div>
+        </div>
+    </section>
+
+    <nav class="nav">
+        <button class="nav-btn" id="prev">↑</button>
+        <button class="nav-btn" id="next">↓</button>
+    </nav>
+
+    <script>
+        const slides = document.querySelectorAll('.slide');
+        const prog = document.getElementById('prog');
+        let current = 0;
+
+        function goTo(i) {
+            i = Math.max(0, Math.min(slides.length - 1, i));
+            current = i;
+            slides[i].scrollIntoView({ behavior: 'smooth' });
+            prog.style.width = ((i + 1) / slides.length * 100) + '%';
+        }
+
+        document.getElementById('next').onclick = () => goTo(current + 1);
+        document.getElementById('prev').onclick = () => goTo(current - 1);
+        document.addEventListener('keydown', e => {
+            if (e.key === 'ArrowDown' || e.key === 'ArrowRight') goTo(current + 1);
+            if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') goTo(current - 1);
+        });
+
+        const obs = new IntersectionObserver(entries => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    e.target.classList.add('visible');
+                    current = Array.from(slides).indexOf(e.target);
+                    prog.style.width = ((current + 1) / slides.length * 100) + '%';
+                }
+            });
+        }, { threshold: 0.3 });
+
+        slides.forEach(s => obs.observe(s));
+        goTo(0);
+    </script>
+</body>
+
+</html>
